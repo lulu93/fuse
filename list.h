@@ -1,4 +1,3 @@
-
 #ifndef __LIST_H__
 #define __LIST_H__
  
@@ -51,3 +50,5 @@ static inline void list_del(struct list_node* node)
          (p) != (head); \
          (p) = (n), (n) = (p)->next)
  
+
+#endif
