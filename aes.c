@@ -440,6 +440,7 @@ static void BlockCopy(uint8_t* output, const uint8_t* input)
   for (i=0;i<KEYLEN;++i)
   {
     output[i] = input[i];
+
   }
 }
 
@@ -448,7 +449,7 @@ static void BlockCopy(uint8_t* output, const uint8_t* input)
 /*****************************************************************************/
 /* Public functions:                                                         */
 /*****************************************************************************/
-#if defined(ECB) && ECB
+//#if defined(ECB) && ECB
 
 
 void AES128_ECB_encrypt(const uint8_t* input, const uint8_t* key, uint8_t* output)
@@ -478,13 +479,13 @@ void AES128_ECB_decrypt(const uint8_t* input, const uint8_t* key, uint8_t *outpu
 }
 
 
-#endif // #if defined(ECB) && ECB
+//#endif // #if defined(ECB) && ECB
 
 
 
 
 
-#if defined(CBC) && CBC
+//#if defined(CBC) && CBC
 
 
 static void XorWithIv(uint8_t* buf)
@@ -529,6 +530,7 @@ void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 
   if(remainders)
   {
+  	printf("remainders = %d\n", remainders);
     BlockCopy(output, input);
     memset(output + remainders, 0, KEYLEN - remainders); /* add 0-padding */
     state = (state_t*)output;
@@ -577,5 +579,5 @@ void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
   }
 }
 
-
-#endif // #if defined(CBC) && CBC
+//
+//#endif // #if defined(CBC) && CBC
