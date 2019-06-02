@@ -321,38 +321,17 @@ static int xmp_open(const char *path, struct fuse_file_info *fi)
 	return 0;
 }
 
-// static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
-// 		    struct fuse_file_info *fi)
-// {
-// 	int res;
-
-// 	(void) path;
-// 	res = pread(fi->fh, buf, size, offset);
-// 	if (res == -1)
-// 		res = -errno;
-
-// 	return res;
-// }
 static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
-		      struct fuse_file_info *fi)
+		    struct fuse_file_info *fi)
 {
-    
-	if(strcmp(path, hello_path) != 0)
-		return -ENOENT;
+	int res;
 
-    /* 通过fuse_get_context可以取出fuse_new传入的用户参数，该函数在fuse_operations所有的函数中都可以调用 */
-    struct fuse_context * fc = fuse_get_context();
-    int * data = fc->private_data;
+	(void) path;
+	res = pread(fi->fh, buf, size, offset);
+	if (res == -1)
+		res = -errno;
 
-    int len = 0;
-    /* 长度返回0时，本次read就结束了 */
-    if( *data % 2 == 0)
-    {
-        len = sprintf(buf,"%s user_data:%d open handle:%lld \n",hello_str,*data,fi->fh);
-    }
-    (*data)++;
-
-	return len;
+	return res;
 }
 
 static int xmp_read_buf(const char *path, struct fuse_bufvec **bufp,
@@ -581,34 +560,8 @@ static struct fuse_operations xmp_oper = {
 #endif
 };
 
-// int main(int argc, char *argv[])
-// {
-// 	umask(0);
-// 	return fuse_main(argc, argv, &xmp_oper, NULL);
-// }
-#define MOUNT_POINT "hfs"
-int main()
+int main(int argc, char *argv[])
 {
-    char * mountpoint = NULL;
-    char * argv[] = {"usfs", "-d", MOUNT_POINT, NULL};
-    struct fuse_args args = FUSE_ARGS_INIT(3, argv);
-    
-    fuse_parse_cmdline(&args, &mountpoint, NULL, NULL);
-    struct fuse_chan * ch = fuse_mount(mountpoint, &args);
-    struct fuse * fuse = fuse_new(ch, &args, &api_oper, sizeof(struct fuse_operations), &user_data);
-    
-    pthread_t tid_fuse;
-    pthread_create(&tid_fuse, NULL, (void *)thread_fuse, fuse);
-    
-    while (getchar() != 'q')
-    {
-        usleep(1000);
-    }
-    fuse_exit(fuse);    /* 退出fuse_loop */
-    fuse_unmount(mountpoint, ch); /* 对应fuse_mount */
-    fuse_destroy(fuse); /* 对应fuse_new */
-    fuse_opt_free_args(&args); /* fuse_parse_cmdline里面会申请内存，需释放 */
-    free(mountpoint);
-
-    return 0;
+	umask(0);
+	return fuse_main(argc, argv, &xmp_oper, NULL);
 }
