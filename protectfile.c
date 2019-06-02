@@ -34,8 +34,7 @@ int main(int argc,char* argv[]) {
 		printf("input = %s\n", input);
 		//AES128_ECB_encrypt(input, (uint8_t*)argv[2], output);
 		AES128_CBC_encrypt_buffer(output, input, numread, (uint8_t*)argv[2], (uint8_t*)iv);
-		if((stream=fopen(argv[3],"w"))==NULL)
-	    {
+		if((stream=fopen(argv[3],"w"))==NULL) {
 			
 	        printf("Can not open file \n");
 	        return 0;
