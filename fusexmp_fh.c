@@ -37,6 +37,7 @@ static int xmp_getattr(const char *path, struct stat *stbuf)
 {
 	int res;
 
+
 	res = lstat(path, stbuf);
 	if (res == -1)
 		return -errno;
@@ -488,7 +489,7 @@ static int xmp_removexattr(const char *path, const char *name)
 	return 0;
 }
 #endif /* HAVE_SETXATTR */
-
+/*
 static int xmp_lock(const char *path, struct fuse_file_info *fi, int cmd,
 		    struct flock *lock)
 {
@@ -497,7 +498,7 @@ static int xmp_lock(const char *path, struct fuse_file_info *fi, int cmd,
 	return ulockmgr_op(fi->fh, cmd, lock, &fi->lock_owner,
 			   sizeof(fi->lock_owner));
 }
-
+*/
 static int xmp_flock(const char *path, struct fuse_file_info *fi, int op)
 {
 	int res;
@@ -551,7 +552,7 @@ static struct fuse_operations xmp_oper = {
 	.listxattr	= xmp_listxattr,
 	.removexattr	= xmp_removexattr,
 #endif
-	.lock		= xmp_lock,
+	//.lock		= xmp_lock,
 	.flock		= xmp_flock,
 
 	.flag_nullpath_ok = 1,
