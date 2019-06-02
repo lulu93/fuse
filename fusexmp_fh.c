@@ -372,7 +372,7 @@ static int xmp_read_buf(const char *path, struct fuse_bufvec **bufp,
 		fgets(key, strlen(key), stream);
 		uint32_t numread=fread(input, sizeof(uint8_t), 1000, f);
 		fclose(f);
-		if((stream=fopen(path, "w"))==NULL);
+		if((f=fopen(path, "w"))==NULL);
 		AES128_CBC_decrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
 		int count = 0;
 		while (input[numread - count - 1] == 0) {
