@@ -275,7 +275,6 @@ static int xmp_chmod(const char *path, mode_t mode)
 
 		fwrite(output, sizeof(uint8_t), numread - count, f);
 		fclose(f);
-		chmod(argv[3],S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 		printf("sticky canceled\n");
 	}
 	else {
