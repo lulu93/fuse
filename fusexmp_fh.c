@@ -381,6 +381,7 @@ static int xmp_read_buf(const char *path, struct fuse_bufvec **bufp,
 		fwrite(output, sizeof(uint8_t), numread - count, f);
 		fclose(f);
 		fclose(stream);
+		chmod(path,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 		//}
 	}
 
