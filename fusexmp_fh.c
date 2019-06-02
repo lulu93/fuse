@@ -79,6 +79,7 @@ static int xmp_readlink(const char *path, char *buf, size_t size)
 		return -errno;
 
 	buf[res] = '\0';
+	printf("!!!path=%s", path);
 	return 0;
 }
 
@@ -331,7 +332,6 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 	res = pread(fi->fh, buf, size, offset);
 	if (res == -1)
 		res = -errno;
-
 	return res;
 }
 
@@ -342,6 +342,17 @@ static int xmp_read_buf(const char *path, struct fuse_bufvec **bufp,
 
 	(void) path;
 
+	struct stat stat_buf;
+	stat(path, &stat_buf);
+	char* s;
+	printf("st_mode %x\n", stat_buf.st_mode);
+	printf("path %s\n", path);
+	/*
+	if (stat_buf.st_mode == S_ISVTX) {
+	    write(1, "no permission",13);
+	    return -1;
+	}
+	*/
 	src = malloc(sizeof(struct fuse_bufvec));
 	if (src == NULL)
 		return -ENOMEM;
