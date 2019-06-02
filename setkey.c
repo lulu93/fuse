@@ -12,14 +12,18 @@ int setkey(char* k0, char* k1) {
     printf("The UID is %d \n", getuid());
     printf("The login name is %s\n", getlogin());
     char space = '\n';
-    fwrite(username, sizeof(char), strlen(username), stream);
-    fwrite(&space, sizeof(char), 1, stream);
+    //fwrite(username, sizeof(char), strlen(username), stream);
+    //fwrite(&space, sizeof(char), 1, stream);
     fwrite(k0, sizeof(char), strlen(k0), stream);
     fwrite(k1, sizeof(char), strlen(k1), stream);
     fclose(stream);
     return 0;
  }
 int main(int argc, char* argv[]){
+    if (argc != 3) {
+    	printf("please enter the 2 parts of the key");
+	return -1;
+    }
     setkey(argv[1], argv[2]);
     // int uid = getuid();
     // char* username = getlogin();

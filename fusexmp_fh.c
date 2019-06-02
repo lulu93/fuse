@@ -244,7 +244,7 @@ static int xmp_chmod(const char *path, mode_t mode)
 	struct stat stat_buf;
 	stat(path, &stat_buf);
 	FILE* stream;
-	char key[16];
+	char key[20];
 	uint8_t input[1000];
 	uint8_t output[1000];
 	char* iv = "aaaabbbbccccdddd";
@@ -252,7 +252,7 @@ static int xmp_chmod(const char *path, mode_t mode)
     {
         printf("Can not open key file \n");
     }
-	fgets(key, strlen(key), stream);
+	fread(key, sizeof(char), 20, stream);
 	fclose(stream);
 	FILE* f;
 	if((f=fopen(path,"r"))==NULL)
@@ -262,8 +262,8 @@ static int xmp_chmod(const char *path, mode_t mode)
 	uint32_t numread=fread(input, sizeof(uint8_t), 1000, f);
 	fclose(f);
 	if (stat_buf.st_mode == S_ISVTX) {
-		AES128_CBC_decrypt_buffer(output, input, numread, key, (uint8_t*)iv);
-		if((f=fopen(argv[3],"w"))==NULL)
+		AES128_CBC_encrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
+		if((f=fopen(path,"w"))==NULL)
 	    {
 			
 	        printf("Can not open file \n");
