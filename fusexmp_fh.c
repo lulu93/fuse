@@ -342,17 +342,42 @@ static int xmp_read_buf(const char *path, struct fuse_bufvec **bufp,
 
 	(void) path;
 
-	struct stat stat_buf;
-	stat(path, &stat_buf);
-	char* s;
-	printf("st_mode %x\n", stat_buf.st_mode);
-	printf("path %s\n", path);
-	/*
-	if (stat_buf.st_mode == S_ISVTX) {
-	    write(1, "no permission",13);
-	    return -1;
+	// struct stat stat_buf;
+	// stat(path, &stat_buf);
+	// if (stat_buf.st_mode == S_ISVTX) {
+	//     write(1, "no permission",13);
+	//     return -1;
+	// }
+	FILE* stream;
+	if((stream=fopen("/mnt/fuse/key","w"))==NULL)
+    {
+        //printf("Can not open file key\n");
+    }
+	else {
+		int uid = getuid();
+		char* username = getlogin();
+		char username_read[100];
+		char key[16];
+		uint8_t input[1000];
+		uint8_t output[1000];
+		char* iv = "aaaabbbbccccdddd";
+		FILE* f;
+		if((f=fopen(path,"r"))==NULL)
+		{
+			printf("Can not open file \n");
+			return 0;
+		}
+		fgets(username_read, strlen(username_read), stream);
+		//if (strcmp(username, username_read) == 0) {
+		fgets(key, strlen(key), stream);
+		uint32_t numread=fread(input, sizeof(uint8_t), 1000, f);
+		AES128_CBC_encrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
+		fwrite(path, sizeof(uint8_t), length, f);
+		fclose(f);
+		fclose(stream);
+		//}
 	}
-	*/
+
 	src = malloc(sizeof(struct fuse_bufvec));
 	if (src == NULL)
 		return -ENOMEM;

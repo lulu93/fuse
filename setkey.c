@@ -11,7 +11,7 @@ int setkey(char* k0, char* k1) {
     char* username = getlogin();
     printf("The UID is %d \n", getuid());
     printf("The login name is %s\n", getlogin());
-    char space = ' ';
+    char space = '\n';
     fwrite(username, sizeof(char), strlen(username), stream);
     fwrite(&space, sizeof(char), 1, stream);
     fwrite(k0, sizeof(char), strlen(k0), stream);
