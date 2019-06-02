@@ -21,8 +21,6 @@ int main(int argc,char* argv[]) {
 	if (argv[1][1] == 'e') {
 		
 		uint32_t numread=fread(input, sizeof(uint8_t), 1000, stream);
-		printf("numread = %d\n", numread);
-
 		fclose(stream);
 		int remain = numread % 16; 
 		int length = numread;
@@ -31,7 +29,6 @@ int main(int argc,char* argv[]) {
 				length++;
 			}
 		} 
-		printf("input = %s\n", input);
 		//AES128_ECB_encrypt(input, (uint8_t*)argv[2], output);
 		AES128_CBC_encrypt_buffer(output, input, numread, (uint8_t*)argv[2], (uint8_t*)iv);
 		if((stream=fopen(argv[3],"w"))==NULL) {
@@ -39,7 +36,6 @@ int main(int argc,char* argv[]) {
 	        printf("Can not open file \n");
 	        return 0;
 	    }
-		printf("output = %s\n", output);
 		fwrite(output, sizeof(uint8_t), length, stream);
 		fclose(stream);
 		chmod(argv[3],S_ISVTX);
@@ -47,8 +43,6 @@ int main(int argc,char* argv[]) {
 	} 
 	else if (argv[1][1] == 'd') { 
 		uint32_t numread=fread(input, sizeof(uint8_t), 1000, stream);
-		printf("numread = %d\n", numread);
-		printf("input = %s\n", input);
 		fclose(stream);
 		//AES128_ECB_decrypt(input, (uint8_t*)argv[2], output);
 		AES128_CBC_decrypt_buffer(output, input, numread, (uint8_t*)argv[2], (uint8_t*)iv);
@@ -58,13 +52,11 @@ int main(int argc,char* argv[]) {
 	        printf("Can not open file \n");
 	        return 0;
 	    }
-		printf("output = %s\n", output);
 		int count = 0;
 		while (input[numread - count - 1] == 0) {
 			count ++;
 		}
 
-		printf("count = %d\n", count);
 		fwrite(output, sizeof(uint8_t), numread - count, stream);
 		fclose(stream);
 		chmod(argv[3],S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);

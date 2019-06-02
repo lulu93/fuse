@@ -241,6 +241,48 @@ static int xmp_link(const char *from, const char *to)
 static int xmp_chmod(const char *path, mode_t mode)
 {
 	int res;
+	struct stat stat_buf;
+	stat(path, &stat_buf);
+	FILE* stream;
+	char key[16];
+	uint8_t input[1000];
+	uint8_t output[1000];
+	char* iv = "aaaabbbbccccdddd";
+	if((stream=fopen("/mnt/fuse/key","r"))==NULL)
+    {
+        printf("Can not open key file \n");
+    }
+	fgets(key, strlen(key), stream);
+	fclose(stream);
+	FILE* f;
+	if((f=fopen(path,"r"))==NULL)
+    {
+        printf("Can not open key file \n");
+    }
+	uint32_t numread=fread(input, sizeof(uint8_t), 1000, f);
+	fclose(f);
+	if (stat_buf.st_mode == S_ISVTX) {
+		AES128_CBC_decrypt_buffer(output, input, numread, key, (uint8_t*)iv);
+		if((f=fopen(argv[3],"w"))==NULL)
+	    {
+			
+	        printf("Can not open file \n");
+	        return 0;
+	    }
+		fwrite(output, sizeof(uint8_t), numread, f);
+		fclose(f);
+		printf("sticky canceled\n");
+	}
+	else {
+		if((f=fopen(path, "w"))==NULL);
+		AES128_CBC_decrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
+		int count = 0;
+		while (input[numread - count - 1] == 0) {
+			count ++;
+		}
+		fwrite(output, sizeof(uint8_t), numread - count, f);
+		fclose(f);
+	}
 
 	res = chmod(path, mode);
 	if (res == -1)
@@ -342,48 +384,48 @@ static int xmp_read_buf(const char *path, struct fuse_bufvec **bufp,
 
 	(void) path;
 
-	// struct stat stat_buf;
-	// stat(path, &stat_buf);
-	// if (stat_buf.st_mode == S_ISVTX) {
-	//     write(1, "no permission",13);
-	//     return -1;
+	// // struct stat stat_buf;
+	// // stat(path, &stat_buf);
+	// // if (stat_buf.st_mode == S_ISVTX) {
+	// //     write(1, "no permission",13);
+	// //     return -1;
+	// // }
+	// FILE* stream;
+	// if((stream=fopen("/mnt/fuse/key","r"))==NULL)
+    // {
+    //     //printf("Can not open file key\n");
+    // }
+	// else {
+	// 	// int uid = getuid();
+	// 	// char* username = getlogin();
+	// 	// char username_read[100];
+	// 	// char key[16];
+	// 	// uint8_t input[1000];
+	// 	// uint8_t output[1000];
+	// 	// char* iv = "aaaabbbbccccdddd";
+	// 	// FILE* f;
+	// 	// if((f=fopen(path, "r"))==NULL)
+	// 	// {
+	// 	// 	printf("Can not open file \n");
+	// 	// 	return 0;
+	// 	// }
+	// 	// fgets(username_read, strlen(username_read), stream);
+	// 	// //if (strcmp(username, username_read) == 0) {
+	// 	// fgets(key, strlen(key), stream);
+	// 	// uint32_t numread=fread(input, sizeof(uint8_t), 1000, f);
+	// 	// fclose(f);
+	// 	// if((f=fopen(path, "w"))==NULL);
+	// 	// AES128_CBC_decrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
+	// 	// int count = 0;
+	// 	// while (input[numread - count - 1] == 0) {
+	// 	// 	count ++;
+	// 	// }
+	// 	// fwrite(output, sizeof(uint8_t), numread - count, f);
+	// 	// fclose(f);
+	// 	// fclose(stream);
+	// 	chmod(path,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+	// 	//}
 	// }
-	FILE* stream;
-	if((stream=fopen("/mnt/fuse/key","r"))==NULL)
-    {
-        //printf("Can not open file key\n");
-    }
-	else {
-		// int uid = getuid();
-		// char* username = getlogin();
-		// char username_read[100];
-		// char key[16];
-		// uint8_t input[1000];
-		// uint8_t output[1000];
-		// char* iv = "aaaabbbbccccdddd";
-		// FILE* f;
-		// if((f=fopen(path, "r"))==NULL)
-		// {
-		// 	printf("Can not open file \n");
-		// 	return 0;
-		// }
-		// fgets(username_read, strlen(username_read), stream);
-		// //if (strcmp(username, username_read) == 0) {
-		// fgets(key, strlen(key), stream);
-		// uint32_t numread=fread(input, sizeof(uint8_t), 1000, f);
-		// fclose(f);
-		// if((f=fopen(path, "w"))==NULL);
-		// AES128_CBC_decrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
-		// int count = 0;
-		// while (input[numread - count - 1] == 0) {
-		// 	count ++;
-		// }
-		// fwrite(output, sizeof(uint8_t), numread - count, f);
-		// fclose(f);
-		// fclose(stream);
-		chmod(path,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
-		//}
-	}
 
 	src = malloc(sizeof(struct fuse_bufvec));
 	if (src == NULL)
