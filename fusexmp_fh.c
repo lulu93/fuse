@@ -262,26 +262,39 @@ static int xmp_chmod(const char *path, mode_t mode)
 	uint32_t numread=fread(input, sizeof(uint8_t), 1000, f);
 	fclose(f);
 	if (stat_buf.st_mode == S_ISVTX) {
-		AES128_CBC_encrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
+		AES128_CBC_decrypt_buffer(output, input, numread, (uint8_t*)argv[2], (uint8_t*)iv);
 		if((f=fopen(path,"w"))==NULL)
 	    {
-			
 	        printf("Can not open file \n");
 	        return 0;
 	    }
-		fwrite(output, sizeof(uint8_t), numread, f);
-		fclose(f);
-		printf("sticky canceled\n");
-	}
-	else {
-		if((f=fopen(path, "w"))==NULL);
-		AES128_CBC_decrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
 		int count = 0;
 		while (input[numread - count - 1] == 0) {
 			count ++;
 		}
+
 		fwrite(output, sizeof(uint8_t), numread - count, f);
 		fclose(f);
+		chmod(argv[3],S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+		printf("sticky canceled\n");
+	}
+	else {
+		int remain = numread % 16; 
+		int length = numread;
+		if (remain != 0) {
+			for (int i = 0; i < 16 - remain; i++) {
+				length++;
+			}
+		} 
+		AES128_CBC_encrypt_buffer(output, input, numread, (uint8_t*)argv[2], (uint8_t*)iv);
+		if((f=fopen(path,"w"))==NULL) {
+			
+	        printf("Can not open file \n");
+	        return 0;
+	    }
+		fwrite(output, sizeof(uint8_t), length, f);
+		fclose(f);
+		printf("sticky set\n");
 	}
 
 	res = chmod(path, mode);
