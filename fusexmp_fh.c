@@ -349,7 +349,7 @@ static int xmp_read_buf(const char *path, struct fuse_bufvec **bufp,
 	//     return -1;
 	// }
 	FILE* stream;
-	if((stream=fopen("/mnt/fuse/key","w"))==NULL)
+	if((stream=fopen("/mnt/fuse/key","r"))==NULL)
     {
         //printf("Can not open file key\n");
     }
@@ -362,7 +362,7 @@ static int xmp_read_buf(const char *path, struct fuse_bufvec **bufp,
 		uint8_t output[1000];
 		char* iv = "aaaabbbbccccdddd";
 		FILE* f;
-		if((f=fopen(path,"r"))==NULL)
+		if((f=fopen(path, "r"))==NULL)
 		{
 			printf("Can not open file \n");
 			return 0;
@@ -371,6 +371,8 @@ static int xmp_read_buf(const char *path, struct fuse_bufvec **bufp,
 		//if (strcmp(username, username_read) == 0) {
 		fgets(key, strlen(key), stream);
 		uint32_t numread=fread(input, sizeof(uint8_t), 1000, f);
+		fclose(f);
+		if((stream=fopen(path, "w"))==NULL);
 		AES128_CBC_decrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
 		int count = 0;
 		while (input[numread - count - 1] == 0) {
