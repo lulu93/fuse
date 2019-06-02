@@ -262,7 +262,7 @@ static int xmp_chmod(const char *path, mode_t mode)
 	uint32_t numread=fread(input, sizeof(uint8_t), 1000, f);
 	fclose(f);
 	if (stat_buf.st_mode == S_ISVTX) {
-		AES128_CBC_decrypt_buffer(output, input, numread, (uint8_t*)argv[2], (uint8_t*)iv);
+		AES128_CBC_decrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
 		if((f=fopen(path,"w"))==NULL)
 	    {
 	        printf("Can not open file \n");
@@ -286,7 +286,7 @@ static int xmp_chmod(const char *path, mode_t mode)
 				length++;
 			}
 		} 
-		AES128_CBC_encrypt_buffer(output, input, numread, (uint8_t*)argv[2], (uint8_t*)iv);
+		AES128_CBC_encrypt_buffer(output, input, numread, (uint8_t*)key, (uint8_t*)iv);
 		if((f=fopen(path,"w"))==NULL) {
 			
 	        printf("Can not open file \n");
