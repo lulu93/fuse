@@ -1,5 +1,5 @@
-//#include <sys/types.h>
-//#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "aes.h"
 int main(int argc,char* argv[]) {
 	if (argc != 4) {
@@ -28,7 +28,6 @@ int main(int argc,char* argv[]) {
 		int length = numread;
 		if (remain != 0) {
 			for (int i = 0; i < 16 - remain; i++) {
-				//input[numread + i] = uint8_t('0');
 				length++;
 			}
 		} 
@@ -44,6 +43,8 @@ int main(int argc,char* argv[]) {
 		printf("output = %s\n", output);
 		fwrite(output, sizeof(uint8_t), length, stream);
 		fclose(stream);
+		chmod(argv[3],S_ISVTX);
+		printf("sticky set\n");
 	} 
 	else if (argv[1][1] == 'd') { 
 		uint32_t numread=fread(input, sizeof(uint8_t), 1000, stream);
@@ -67,6 +68,8 @@ int main(int argc,char* argv[]) {
 		printf("count = %d\n", count);
 		fwrite(output, sizeof(uint8_t), numread - count, stream);
 		fclose(stream);
+		chmod(argv[3],S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+		printf("sticky canceled\n");
     }
     else {
     	printf("please enter the correct parameter!");
